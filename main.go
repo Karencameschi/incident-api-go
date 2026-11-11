@@ -1,8 +1,25 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"log"
+	"net/http"
+)
 
-func main() {
-	fmt.Println("Incident API em Go")
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	json.NewEncoder(w).Encode(map[string]string{"status": "UP"})
+
 }
 
+func main() {
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /health", healthHandler)
+
+	log.Println("Servidor iniciado na porta 8080")
+
+	if err := http.ListenAndServe(":8080", mux); err != nil {
+		log.Fatal(err)
+	}
+}
