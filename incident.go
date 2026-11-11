@@ -19,6 +19,10 @@ type Store struct {
 	nextID    int
 }
 
+func NewStore() *Store {
+	return &Store{nextID: 1}
+}
+
 func (s *Store) List() []Incident {
 	s.mu.Lock()
 	defer s.mu.Unlock()

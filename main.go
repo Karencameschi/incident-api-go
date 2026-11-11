@@ -14,8 +14,13 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+
+	h := &Handler{store: NewStore()}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", healthHandler)
+	mux.HandleFunc("GET /incidents", h.listIncidents)
+	mux.HandleFunc("POST /incidents", h.createIncident)
 
 	log.Println("Servidor iniciado na porta 8080")
 
