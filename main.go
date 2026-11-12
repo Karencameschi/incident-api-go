@@ -2,8 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 )
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
@@ -15,6 +16,8 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
 	h := &Handler{store: NewStore()}
 
 	mux := http.NewServeMux()
@@ -22,9 +25,10 @@ func main() {
 	mux.HandleFunc("GET /incidents", h.listIncidents)
 	mux.HandleFunc("POST /incidents", h.createIncident)
 
-	log.Println("Servidor iniciado na porta 8080")
+	logger.Info("servidor iniciado", "porta", 8080)
 
-	if err := http.ListenAndServe(":8080", mux); err != nil {
-		log.Fatal(err)
+	if err := http.ListenAndServe(":8080", loggingMiddleware(logger, mux)); err != nil {
+		logger.Error("falha ao iniciar o servidor", "error", err.Error())
+		os.Exit(1)
 	}
 }
